@@ -1,14 +1,32 @@
+// ================= Utility Imports =================
+
+// clsx → Handles conditional classNames
 import { type ClassValue, clsx } from "clsx";
+
+// twMerge → Merges Tailwind classes properly (avoids conflicts)
 import { twMerge } from "tailwind-merge";
 
+
+// ================= ClassName Utility =================
+// Combines clsx + tailwind-merge
+// Used throughout the app for clean conditional styling
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
+
+// ================= Currency Types =================
+
+// Supported currency types
 export type Currency = "USD" | "EUR" | "GBP" | "INR";
 
+// List of currencies (used in dropdowns)
 export const CURRENCIES: Currency[] = ["USD", "EUR", "GBP", "INR"];
 
+
+// ================= Exchange Rates =================
+// Base currency = USD
+// These are static demo values (not real-time API rates)
 const EXCHANGE_RATES: Record<Currency, number> = {
     USD: 1,
     EUR: 0.92,
@@ -16,17 +34,26 @@ const EXCHANGE_RATES: Record<Currency, number> = {
     INR: 83.12,
 };
 
-const CURRENCY_SYMBOLS: Record<Currency, string> = {
+
+// ================= Currency Symbols =================
+export const CURRENCY_SYMBOLS: Record<Currency, string> = {
     USD: "$",
     EUR: "€",
     GBP: "£",
     INR: "₹",
 };
 
+
+// ================= Format Currency Function =================
+// Converts USD base value → selected currency → formatted string
 export function formatCurrency(value: number, currency: Currency): string {
+
     const rate = EXCHANGE_RATES[currency];
+
+    // Convert value using exchange rate
     const convertedValue = value * rate;
 
+    // Format using Intl API
     return new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: currency,
@@ -34,14 +61,37 @@ export function formatCurrency(value: number, currency: Currency): string {
     }).format(convertedValue);
 }
 
-export interface MarketTrend {
-    industry: string;
-    growth: number;
-    volume: number;
+
+// ================= Currency Conversion Engine =================
+// Converts between any two currencies
+export function convertCurrencyValue(
+    amount: number,
+    from: Currency,
+    to: Currency
+): number {
+
+    // Step 1: Convert source amount → USD (base)
+    const amountInUSD = amount / EXCHANGE_RATES[from];
+
+    // Step 2: Convert USD → target currency
+    return amountInUSD * EXCHANGE_RATES[to];
 }
 
+
+// ================= Market Trend Interface =================
+// Used for sector growth charts
+export interface MarketTrend {
+    industry: string;
+    growth: number;  // % growth
+    volume: number;  // Trade volume
+}
+
+
+// ================= Mock Market Trends Fetch =================
+// Simulates API call with 1.5s delay
 export const fetchMarketTrends = async (): Promise<MarketTrend[]> => {
-    // Simulate API delay
+
+    // Artificial delay
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     return [
@@ -53,6 +103,8 @@ export const fetchMarketTrends = async (): Promise<MarketTrend[]> => {
     ];
 };
 
+
+// ================= Market News Interface =================
 export interface MarketNewsItem {
     id: string;
     title: string;
@@ -62,8 +114,14 @@ export interface MarketNewsItem {
     timestamp: string;
 }
 
+
+// ================= Mock Market News Fetch =================
+// Simulates real-time news API call
 export const fetchMarketNews = async (): Promise<MarketNewsItem[]> => {
+
+    // Artificial delay
     await new Promise(resolve => setTimeout(resolve, 1500));
+
     return [
         {
             id: "1",
